@@ -1,10 +1,10 @@
 const { Pool } = require("pg");
 
 const credentials = {
-  user: "postgres",
-  password: "postgrespw",
-  database: "test",
-  port: 49153,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
+  port: process.env.DATABASE_PORT,
 };
 
 const pool = new Pool(credentials);
@@ -14,7 +14,7 @@ const connectToDatabase = async () => {
     await pool.connect();
     console.log("Connected to database");
   } catch (error) {
-    console.log("failed to connect to database");
+    console.log("failed to connect to database", error);
   }
 };
 
