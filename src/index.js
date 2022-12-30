@@ -1,13 +1,13 @@
 const Express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const dotenv = require("dotenv").config();
 const { connectToDatabase } = require("./db.js");
+const userRouter = require("./routes/user-routes.js");
 
 const app = Express();
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
-dotenv.config();
 //middlewares
 app.use(
   cors({
@@ -18,6 +18,8 @@ app.use(
 app.use(Express.json());
 
 //Routes
+
+app.use("/api/user", userRouter);
 
 const server = app.listen(PORT, async () => {
   await connectToDatabase();
