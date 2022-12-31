@@ -7,6 +7,7 @@ const {
 
 const registerUserHandler = async (req, res) => {
   const { userId, password, mobileNumber } = req.body;
+  console.log(req.body);
 
   try {
     let user = await getUser(userId);
@@ -19,7 +20,15 @@ const registerUserHandler = async (req, res) => {
     const hashedPassword = await hashPassword(password);
 
     user = await createUser({ userId, hashedPassword, mobileNumber });
-    return res.status(200).json({ status: "Success", data: { user } });
+    const userResponse = {
+      id: user.id,
+      userId: user.userid,
+      mobileNumber: user.mobilenumber,
+    };
+
+    return res
+      .status(200)
+      .json({ status: "Success", data: { user: userResponse } });
   } catch (err) {
     res.status(500).json({
       status: "failed",
@@ -32,7 +41,7 @@ const loginUserHandler = async (req, res) => {
   const { userId, password } = req.body;
 
   try {
-    const user = await getUser(userId);
+    let user = await getUser(userId);
     if (!user) {
       return res.status(403).json({
         status: "Failed",
@@ -48,10 +57,17 @@ const loginUserHandler = async (req, res) => {
         error: "User ID and Password does not match",
       });
     }
+    console.log(user);
+
+    const userResponse = {
+      id: user.id,
+      userId: user.userid,
+      mobileNumber: user.mobilenumber,
+    };
 
     return res.status(200).json({
       status: "Success",
-      data: { user },
+      data: { user: userResponse },
     });
   } catch (err) {
     res.status(500).json({
@@ -78,9 +94,15 @@ const forgotPasswordHandler = async (req, res) => {
 
     await updateUserPassword(user.id, hashedPassword);
 
+    const userResponse = {
+      id: user.id,
+      userId: user.userid,
+      mobileNumber: user.mobilenumber,
+    };
+
     return res.status(200).json({
       status: "Success",
-      data: { user },
+      data: { user: userResponse },
     });
   } catch (error) {
     res.status(500).json({
