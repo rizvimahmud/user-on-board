@@ -9,6 +9,6 @@ const router = Router();
 
 router.post("/register", registerUserHandler);
 router.post("/login", loginUserHandler);
-router.post("/forgot-password", forgotPasswordHandler);
+router.put("/forgot-password", forgotPasswordHandler);
 
 module.exports = router;

@@ -6,47 +6,46 @@ const {
 } = require("../utils/user-utils");
 
 const registerUserHandler = async (req, res) => {
-  const { name, password, mobileNumber } = req.body;
+  const { userId, password, mobileNumber } = req.body;
 
   try {
-    let user = await getUser(mobileNumber);
+    let user = await getUser(userId);
 
     if (user) {
       return res
-        .status(403)
-        .json({ status: "Failed", error: "Email is already in use" });
+        .status(409)
+        .json({ status: "Failed", error: "UserId is already in use!" });
     }
     const hashedPassword = await hashPassword(password);
 
-    await createUser(name, email, hashedPassword);
-
+    user = await createUser({ userId, hashedPassword, mobileNumber });
     return res.status(200).json({ status: "Success", data: { user } });
   } catch (err) {
     res.status(500).json({
       status: "failed",
-      error: err.message,
+      error: "Failed to create user. Try again later",
     });
   }
 };
 
-const loginUserHandler = async (req, re) => {
-  const { mobileNumber, password } = req.body;
+const loginUserHandler = async (req, res) => {
+  const { userId, password } = req.body;
 
   try {
-    const user = await getUser(mobileNumber);
+    const user = await getUser(userId);
     if (!user) {
-      return res.status(404).json({
+      return res.status(403).json({
         status: "Failed",
-        error: "Mobile Number/Password is incorrect",
+        error: "User ID and Password does not match",
       });
     }
 
     const compareResult = await comparePassword(password, user.password);
 
     if (!compareResult) {
-      return res.status(404).json({
+      return res.status(403).json({
         status: "failed",
-        error: "Mobile Number/Password is incorrect",
+        error: "User ID and Password does not match",
       });
     }
 
@@ -57,23 +56,22 @@ const loginUserHandler = async (req, re) => {
   } catch (err) {
     res.status(500).json({
       status: "failed",
-      error: err.message,
+      error: "Failed to successfully login. Try again later",
     });
   }
 };
+
 const forgotPasswordHandler = async (req, res) => {
-  const { mobileNumber, newPassword } = req.body;
+  const { userId, newPassword } = req.body;
 
   try {
-    let user = await getUser(mobileNumber);
+    let user = await getUser(userId);
 
-    if (user) {
-      return res
-        .status(403)
-        .json({
-          status: "Failed",
-          error: "No user found with this mobile number",
-        });
+    if (!user) {
+      return res.status(404).json({
+        status: "Failed",
+        error: "No user found with this ID",
+      });
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -87,7 +85,7 @@ const forgotPasswordHandler = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: "failed",
-      error: "Failed to change password",
+      error: "Failed to change password. Try again later",
     });
   }
 };

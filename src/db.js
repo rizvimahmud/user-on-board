@@ -7,11 +7,11 @@ const credentials = {
   port: process.env.DATABASE_PORT,
 };
 
-const pool = new Pool(credentials);
+const db = new Pool(credentials);
 
 const connectToDatabase = async () => {
   try {
-    await pool.connect();
+    await db.connect();
     console.log("Connected to database");
   } catch (error) {
     console.log("failed to connect to database", error);
@@ -19,6 +19,6 @@ const connectToDatabase = async () => {
 };
 
 module.exports = {
-  pool,
+  db,
   connectToDatabase,
 };
